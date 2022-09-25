@@ -1,25 +1,23 @@
+
+---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
-  name: configsources.runtime.huawei.com
+  name: upstreams.extensions.ers.platform.hicloud.com
 spec:
-  group: runtime.huawei.com
+  group: extensions.ers.platform.hicloud.com
   names:
-    kind: ConfigSource
-    listKind: ConfigSourceList
-    plural: configsources
-    shortNames:
-    - cfs
-    singular: configsource
+    kind: Upstream
+    listKind: UpstreamList
+    plural: upstreams
+    singular: upstream
   scope: Namespaced
-  subresources:
-    status: {}
   validation:
     openAPIV3Schema:
-      description: ConfigSource is the Schema for the configsources API
+      description: Upstream is the Schema for the upstreams API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,26 +32,120 @@ spec:
         metadata:
           type: object
         spec:
-          description: ConfigSourceSpec defines the desired state of ConfigSource
+          description: UpstreamSpec defines the desired state of Upstream
           properties:
-            cloudMapID:
+            appID:
               type: string
-            name:
-              description: Foo is an example field of ConfigSource. Edit configsource_types.go
-                to remove/update
+            backendClusters:
+              items:
+                properties:
+                  failTimeout:
+                    format: int32
+                    maximum: 300
+                    minimum: 0
+                    type: integer
+                  greyStatus:
+                    description: backend
+                    enum:
+                    - 1
+                    - 2
+                    format: int32
+                    type: integer
+                  maxFails:
+                    format: int32
+                    maximum: 1000
+                    minimum: 0
+                    type: integer
+                  nodeStatus:
+                    enum:
+                    - 1
+                    - 2
+                    - 3
+                    format: int32
+                    type: integer
+                  serviceName:
+                    maxLength: 63
+                    minLength: 1
+                    type: string
+                  servicePort:
+                    format: int32
+                    maximum: 65535
+                    type: integer
+                  upstreamName:
+                    maxLength: 256
+                    minLength: 1
+                    type: string
+                  weight:
+                    format: int32
+                    maximum: 100
+                    minimum: 1
+                    type: integer
+                  zone:
+                    maxLength: 256
+                    type: string
+                required:
+                - serviceName
+                - servicePort
+                - upstreamName
+                type: object
+              type: array
+            healthCheckConfig:
+              properties:
+                healthResponseCodes:
+                  maxLength: 256
+                  type: string
+                healthThreshold:
+                  format: int32
+                  maximum: 10
+                  minimum: 2
+                  type: integer
+                period:
+                  format: int32
+                  minimum: 1
+                  type: integer
+                timeoutThreshold:
+                  format: int32
+                  minimum: 1
+                  type: integer
+                unHealthThreshold:
+                  format: int32
+                  maximum: 10
+                  minimum: 2
+                  type: integer
+              type: object
+            pbiInfo:
+              properties:
+                pbiMicroServiceName:
+                  maxLength: 256
+                  type: string
+                pbiServiceName:
+                  maxLength: 256
+                  type: string
+                pbiVersionName:
+                  maxLength: 256
+                  type: string
+                pbiVersionNumber:
+                  maxLength: 256
+                  type: string
+              type: object
+            scope:
+              maxLength: 256
+              minLength: 1
               type: string
-            prefix:
+            secret:
               type: string
-            resourceHash:
+            slbServiceName:
+              maxLength: 256
+              minLength: 1
               type: string
+          required:
+          - scope
+          - slbServiceName
           type: object
         status:
-          description: ConfigSourceStatus defines the observed state of ConfigSource
+          description: UpstreamStatus defines the observed state of Upstream
           properties:
             status:
-              description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
-                of cluster Important: Run "make" to regenerate code after modifying
-                this file'
               type: string
           type: object
       type: object
